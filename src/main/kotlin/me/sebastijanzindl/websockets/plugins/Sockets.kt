@@ -14,16 +14,13 @@ fun Application.configureSockets() {
         masking = false
     }
     routing {
-        webSocket("/chat") { // websocketSession
-            for (frame in incoming) {
-                if (frame is Frame.Text) {
-                    val text = frame.readText()
-                    outgoing.send(Frame.Text("YOU SAID: $text"))
-                    if (text.equals("bye", ignoreCase = true)) {
-                        close(CloseReason(CloseReason.Codes.NORMAL, "Client said BYE"))
-                    }
-                }
-            }
-        }
+       webSocket("/chat") {
+           send("You are connected!")
+           for (frame in incoming) {
+               frame as? Frame.Text ?: continue
+               val receivedText = frame.readText()
+               send("You said: $receivedText")
+           }
+       }
     }
 }
